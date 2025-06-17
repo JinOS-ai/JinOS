@@ -8,11 +8,11 @@
 
 ## Team Members
 
-- Lubaba Khalid  - BSDSF22A5--@pucit.edu.pk
+- Lubaba Khalid  - BSDSF22A025@pucit.edu.pk
 - [Member 2 Name]  
 - [Member 3 Name]  
 - [Member 4 Name]  
-- [Your Name]  
+- [Lubaba Khalid]  
 
 ---
 
