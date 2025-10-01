@@ -1,22 +1,4 @@
-# Project Proposal: jinOs@ai
 
-## Team Project for Final Year  
-## Course: Final Year Project  
-## Submission Date: [Date]  
-
----
-
-## Team Members
-
-- Lubaba Khalid  - BSDSF22A025@pucit.edu.pk
-- [Member 2 Name]  
-- [Member 3 Name]  
-- [Member 4 Name]  
-- [Lubaba Khalid]  
-
----
-
-## 1. Project Title
 
 **jinOs@ai: A Minimal, AI-Integrated Multi-Device Operating System**
 
@@ -197,3 +179,4 @@ jinOs@ai will demonstrate our team’s ability to architect and develop a full-s
 **Signatures:**  
 [All Team Members]  
 [Date]  
+
