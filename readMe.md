@@ -23,27 +23,27 @@ Think of it as a **Jarvis-inspired OS** — blending **low-level systems program
 │ Hardware Layer                                   │  
 │ (x86_64 laptops/desktops, ARM64 phones/tablets)  │  
 └──────────────────────────────────────────────────┘  
-│  
+                         │  
 ┌──────────────────────────────────────────────────┐  
 │ Custom Kernel                                    │  
 │ - Hardware abstraction                           │  
 │ - Memory management, multitasking                │  
 │ - Drivers (storage, display, input, network)     │  
 └──────────────────────────────────────────────────┘  
-│  
+                        │  
 ┌──────────────────────────────────────────────────┐  
 │ Compatibility & Runtime Environment              │  
 │ - Android Runtime/Container (e.g., Anbox)        │  
 │ - Linux userspace compatibility (Debian base)    │  
 └──────────────────────────────────────────────────┘  
-│  
+                        │  
 ┌──────────────────────────────────────────────────┐  
 │ Rust + Flutter GUI                               │  
 │ - Display server (Wayland-based/custom)          │  
 │ - Compositor & window management                 │  
 │ - System UI + Apps in Flutter                    │  
 └──────────────────────────────────────────────────┘   
-│  
+                        │  
 ┌──────────────────────────────────────────────────┐  
 │ AI Assistant Layer                               │   
 │ - Local AI engine (Rust, TF Lite, ONNX)          │   
@@ -145,4 +145,5 @@ We welcome contributions in:
 ---
 
 ⚡ *jinOs@ai is a work-in-progress. Early iterations will be minimal, but each cycle brings us closer to a unified AI-native OS.*  
+
 
