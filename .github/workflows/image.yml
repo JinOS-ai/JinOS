@@ -1,0 +1,45 @@
+name: image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  x86-64:
+    name: build and boot (x86-64)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install QEMU and enable KVM
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils ovmf
+          # GitHub's Linux runners expose /dev/kvm; make it usable by the runner user.
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm || true
+
+      - name: Build image (mkosi in the Debian 13 builder container)
+        run: make image MKOSI=container
+
+      - name: Boot test
+        run: make boot-test
+
+      - name: Upload boot log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-test-log
+          path: build/boot-test.log
+          if-no-files-found: ignore
+
+      - name: Upload image
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: jinos-x86-64
+          path: build/jinos.raw
+          retention-days: 7

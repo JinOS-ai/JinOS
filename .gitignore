@@ -1,0 +1,8 @@
+# Build outputs (make image / make run)
+/build/
+# mkosi local state if someone runs it from base/ directly
+/base/mkosi.output/
+/base/mkosi.cache/
+/base/mkosi.builddir/
+/base/mkosi.workspace/
+*.qcow2

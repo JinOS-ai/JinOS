@@ -34,12 +34,12 @@ The working plan for getting from an empty repository to an installable, AI-nati
 - `base/`: mkosi configuration producing a Debian 13 (trixie) image with systemd, systemd-boot, a serial console and an SSH server (dev profile).
 - Kernel: Debian's LTS kernel package to start; custom config deferred to Phase 1.
 - `tools/run-qemu.sh` with virtio-gpu, virtio-net (user-mode with SSH port forward), virtio-blk.
-- `Makefile` targets: `image`, `run`, `ssh`, `clean`.
-- CI (GitHub Actions) that builds the image on every push.
+- `Makefile` targets: `image`, `run`, `run-serial`, `ssh`, `boot-test`, `clean`. `make image` runs mkosi natively on Linux or inside a Debian 13 container elsewhere (macOS, CI).
+- CI (GitHub Actions) that builds the image and boot-tests it to a login prompt on every push.
 
 **Exit criteria**
 - Fresh clone → `make image && make run` → login prompt on the QEMU serial console and in the graphical window.
-- CI green.
+- CI green, including `make boot-test`.
 
 **Risks**
 - mkosi behaviour differs between host distributions. Mitigation: pin the mkosi version; document the host in [docs/dev-environment.md](docs/dev-environment.md); build inside a container if needed.

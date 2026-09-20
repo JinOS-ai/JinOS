@@ -4,7 +4,7 @@
 
 jinOs@ai is a Linux-based operating system whose defining feature is an **assistant built into the system layer** — not an app, but a daemon with a permissioned tool interface to the OS and to every app on it. The rest of the stack is deliberately conventional: a mainline Linux kernel, a Debian base, a Wayland compositor and a Flutter shell.
 
-> **Status: planning / pre-alpha.** Nothing boots yet. This repository currently holds the plan; see [ROADMAP.md](ROADMAP.md) for what gets built in what order.
+> **Status: pre-alpha, Phase 0 (foundations) in progress.** A minimal Debian-based image builds and boots to a login prompt in QEMU; nothing graphical yet. See [ROADMAP.md](ROADMAP.md) for what gets built in what order.
 
 ## What it is
 
@@ -58,16 +58,14 @@ Timeline assumes one full-time developer. Details, exit criteria and risks per p
 - [docs/dev-environment.md](docs/dev-environment.md) — host setup for building and running in QEMU
 - `docs/components/` — design notes per component: [base image](docs/components/base-image.md), [compositor](docs/components/compositor.md), [shell](docs/components/shell.md), [assistant](docs/components/assistant.md), [Android](docs/components/android.md), [updates & installer](docs/components/updates.md)
 
-## Getting started (planned)
-
-Once Phase 0 lands, the intended loop is:
+## Getting started
 
 ```bash
-make image   # build the x86_64 disk image
-make run     # boot it in QEMU
+make image   # build build/jinos.raw (mkosi, natively on Linux or in a Debian 13 container)
+make run     # boot it in QEMU; log in as jin / jinos
 ```
 
-Until then there is nothing to run. See [docs/dev-environment.md](docs/dev-environment.md) for the host prerequisites.
+You need Docker or Podman (or mkosi on a Linux host) to build, and QEMU to run. Details, knobs and platform notes: [docs/dev-environment.md](docs/dev-environment.md).
 
 ## Out of scope (for now)
 

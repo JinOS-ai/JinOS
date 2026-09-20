@@ -1,38 +1,70 @@
 # Base image
 
-**Directory:** `base/` · **Phase:** 0 · **Covers:** kernel config, mkosi profiles, systemd units, overlays
+**Directory:** `base/` · **Phase:** 0 · **Covers:** mkosi configuration, profiles, overlays, partition layout, image-time scripts
 
 ## Purpose
 
-Produce a bootable, reproducible jinOs disk image from Debian 13 packages plus first-party artifacts (`jincomp`, `jinshell`, `jind`).
+Produce a bootable, reproducible jinOs disk image from Debian 13 packages plus
+first-party artifacts (`jincomp`, `jinshell`, `jind` from later phases).
 
-## Contents
+## Layout
 
-- `mkosi.conf` and `mkosi.conf.d/` — distribution, package list, output format (GPT disk with ESP + A/B root + data partition), profiles (`dev`, `release`, `installer`).
-- `kernel/` — Debian kernel package selection now; a custom `.config` fragment from Phase 1 enabling DRM/KMS, virtio-gpu/net/blk/input, `CONFIG_ANDROID_BINDER_IPC`, `CONFIG_ANDROID_BINDERFS`, and disabling what jinOs never uses.
-- `overlay/` — files copied verbatim into the image: `/etc/jinos/`, systemd units, compositor session config.
-- `units/` — `jincomp.service`, `jind.service`, `waydroid-container.service` drop-ins.
+```
+base/
+├── mkosi.conf                 distribution, packages, boot, tools tree
+├── mkosi.profiles/dev/        --profile=dev: openssh-server, sudo, passwords
+│   ├── mkosi.conf
+│   └── mkosi.extra/           dev-only overlay (sshd password login)
+├── mkosi.extra/               overlay copied into every image (/etc/issue, networkd DHCP)
+├── mkosi.repart/              systemd-repart partition definitions
+└── mkosi.postinst.chroot      runs inside the image: creates user jin, enables units
+```
 
-## Package set (Phase 0–2 baseline)
+Build with `make image` (see [dev-environment.md](../dev-environment.md)).
+Outputs land in `build/`: `jinos.raw` (the disk), plus the UKI and kernel
+mkosi extracts alongside it.
 
-systemd, systemd-boot, linux-image (LTS), seatd, pipewire + wireplumber, network-manager, dbus-broker, xdg-desktop-portal (+ a jinOs backend later), cage, foot, a browser (Firefox ESR or Chromium), openssh-server (dev profile only), waydroid (Phase 4), mesa (virgl + llvmpipe).
+## What's in the image (Phase 0)
 
-## Users and sessions
+- **Kernel:** Debian's `linux-image-amd64` (6.12 LTS). A jinOs kernel config
+  (DRM/KMS, virtio, binder) is a Phase 1 deliverable.
+- **Boot:** systemd-boot on an ESP, kernel + initrd as a UKI. The initrd is
+  mkosi's default initrd, not initramfs-tools.
+- **Base:** systemd, udev, dbus-broker, systemd-networkd (DHCP on any
+  ethernet), systemd-resolved, systemd-timesyncd, e2fsprogs/dosfstools,
+  iproute2, procps, less, nano.
+- **Console:** kernel command line `console=tty0 console=ttyS0,115200n8`, so
+  gettys appear on both the graphical console and the serial port.
+- **Users:** `jin` (uid 1000) created by the post-install script. No display
+  manager; `jincomp` will run as `jin` from Phase 1.
+- **Dev profile** (`--profile=dev`, the default in the Makefile): adds
+  `openssh-server` and `sudo`, sets passwords `jinos` for `root` and `jin`,
+  allows password SSH login, adds `jin` to `sudo`. SSH host keys are generated
+  at build time, so every dev image shares them — acceptable for local VMs
+  only. Release images never use this profile.
 
-Single user `jin` (uid 1000) with a systemd user session; `jincomp` runs as `jin` on seat0 via seatd. `jind` runs as a dedicated system user with a D-Bus policy restricting its API to `jin`. No root login; `sudo` only in the `dev` profile.
+## Partition layout
 
-## Partition layout (from Phase 5; designed for from Phase 0)
+Phase 0 (`mkosi.repart/`):
 
-| Partition | Type | Purpose |
-|---|---|---|
-| ESP | vfat | systemd-boot, UKIs for slot A and B |
-| root-A | erofs or squashfs (read-only) | current system |
-| root-B | same | next/previous system |
-| data | ext4 or btrfs | `/home`, `/var`, `/etc/jinos`, Waydroid data, models |
+| Partition | Type | Size | Purpose |
+|---|---|---|---|
+| ESP | vfat | 512 MiB | systemd-boot + `EFI/Linux/*.efi` UKIs |
+| root | ext4 (read-write) | 3 GiB | everything else |
 
-Until Phase 5 the `dev` profile uses a single read-write root to keep iteration fast.
+Phase 5 replaces this with read-only A/B roots (erofs or squashfs) and a
+separate data partition for `/home`, `/var`, `/etc/jinos`, Waydroid and
+models; see [updates.md](updates.md).
+
+## Reproducibility
+
+`ToolsTree=default` makes mkosi build with a pinned Debian 13 tool set rather
+than host tools, so native, container and CI builds produce the same image.
+The package cache lives in `build/cache/`.
 
 ## Open items
 
-- UKIs from day one, or plain kernel + initrd in Phase 0.
-- erofs vs squashfs for the read-only root.
+- Trim the kernel-modules initrd (`KernelModulesInitrdInclude=`) once the
+  Phase 1 kernel config exists; today every module ships in the UKI.
+- Generate SSH host keys at first boot instead of build time.
+- Set `IMAGE_VERSION` in `os-release` from git (needed by Phase 5 updates).

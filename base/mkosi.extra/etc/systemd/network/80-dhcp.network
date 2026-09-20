@@ -1,0 +1,6 @@
+# DHCP on every ethernet interface (virtio-net in QEMU, wired NICs later).
+[Match]
+Type=ether
+
+[Network]
+DHCP=yes
